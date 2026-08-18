@@ -1,88 +1,91 @@
-# Incus + Cloud-Init Utilities
+# incus-cloud-init
 
-This repository contains the following:
+[![Built with Ona](https://ona.com/build-with-ona.svg)](https://app.ona.com/#https://github.com/Interested-Deving-1896/incus-cloud-init) [![KDE Eco](https://img.shields.io/badge/KDE%20Eco-certified-brightgreen?logo=kde&logoColor=white&style=flat-square)](https://eco.kde.org/) [![Blue Angel](https://img.shields.io/badge/Blue%20Angel-DE--UZ%20215-0055a4?style=flat-square)](https://www.blauer-engel.de/en/certification/criteria) [![Energy](https://api.green-coding.io/v1/ci/badge/get?repo=Interested-Deving-1896%2Fincus-cloud-init&branch=main&workflow=eco-audit.yml)](https://metrics.green-coding.io/ci-index.html)
 
-1. Incus Data Source for Cloud-Init which is modified from the existing LXD data source
 
-2. Example configuration for Cloud-Init to only use the Incus data source
+<!-- AI:start:what-it-does -->
+_Description pending._
+<!-- AI:end:what-it-does -->
 
-## Behaviour and Enhancements
+## Architecture
 
-The modifications provided in this repository allows stacking of vendor data and user data sections, essentially allow multiple profiles to configure the same module within cloud-init. Currently as of Incus 6.9, configuration is mutually exclusive, meaning for example `runcmd` stanzas defined in vendor data would be overridden by stanzas defined in user data, which is righteous, but stanzas defined within one Profile would be overridden by another Profile.
+<!-- AI:start:architecture -->
+_Architecture documentation pending._
+<!-- AI:end:architecture -->
 
-The crux of the problem is that the default NoCloud data source is primitive compared to the LXD data source, but while the latter allows retrieval and interpolation of all custom keys via Jinja it is still highly inconvenient.
+## Install
 
-With the changes in this repository applied, one may write the following configuration:
+<!-- Add installation instructions here. This section is yours — the AI will not modify it. -->
 
-```
-architecture: x86_64
-config:
-  cloud-init.user-data: |
-    #cloud-config
-    runcmd:
-      - echo 3 > /output-from-user-data
-  user.custom_2_parent: parent3
-  user.user-data.custom1: |
-    #cloud-config
-    runcmd:
-      - echo 1 > /output-custom1
-  user.user-data.custom2: |
-    ## template: jinja
-    #cloud-config
-    runcmd:
-      - echo {{ ds.config.user_custom_2_parent }} > /output-custom2
+```bash
+git clone https://github.com/Interested-Deving-1896/incus-cloud-init.git
+cd incus-cloud-init
 ```
 
-...and have each runcmd section merged with each other using the default merge strategy of `dict(recurse_array,recurse_str)+list(append)+str(append)` as discussed [here](https://cloudinit.readthedocs.io/en/latest/reference/merging.html). This is achieved by modifying the Incus data source to gather all fragments and generate a MIME Multipart message that replaces the final configuration for both vendor data and user data.
+## Usage
 
-This would also work across multiple profiles given the following example, with the first profile containing:
+<!-- Add usage examples here. This section is yours — the AI will not modify it. -->
 
-```
-$ incus profile show test-1
-config:
-  user.user-data.profile1: |
-    #cloud-config
-    runcmd:
-      - echo 1 > /output-from-profile1
-```
+## Configuration
 
-and the second profile containing:
+<!-- Document configuration options here. This section is yours — the AI will not modify it. -->
 
-```
-$ incus profile show test-2
-config:
-  user.user-data.profile2: |
-    #cloud-config
-    runcmd:
-      - echo 1 > /output-from-profile2
-```
+## CI
 
-As long as each profile accrues configuration everything is merged.
+<!-- AI:start:ci -->
+_CI documentation pending._
+<!-- AI:end:ci -->
 
-Precendence rules are not considered at the moment but this could be added at a later time.
+## Mirror chain
 
-The changes are currently contained in the _MetaDataReader but this can be moved later on.
-
-## Installation
-
-Since the files modify the behaviour of Cloud-Init, it is recommended to place the files into a newly created Incus instance, before it is launched for the first time.
+<!-- AI:start:mirror-chain -->
+This repo is maintained in [`Interested-Deving-1896/incus-cloud-init`](https://github.com/Interested-Deving-1896/incus-cloud-init) and mirrored through:
 
 ```
-$ incus create images:debian/trixie/cloud my-instance
-$ incus file push lib/python3/dist-packages/cloudinit/sources/DataSourceIncus.py \
-    my-instance/lib/python3/dist-packages/cloudinit/sources/DataSourceIncus.py
-$ incus file push etc/cloud/cloud.cfg.d/00_incus.cfg \
-    my-instance/etc/cloud/cloud.cfg.d/00_incus.cfg
+Interested-Deving-1896/incus-cloud-init  ──►  OpenOS-Project-OSP/incus-cloud-init  ──►  OpenOS-Project-Ecosystem-OOC/incus-cloud-init
 ```
 
-If you would like to update an existing instance then you may clean out all residues of cloud-init:
+Changes flow downstream automatically via the hourly mirror chain in
+[`fork-sync-all`](https://github.com/Interested-Deving-1896/fork-sync-all).
+Direct commits to OSP or OOC are detected and opened as PRs back to `Interested-Deving-1896`.
+<!-- AI:end:mirror-chain -->
 
-```
-$ incus exec my-instance -- cloud-init clean --logs --machine-id --configs all
-$ incus stop my-instance
-$ incus start my-instance
-```
+## Contributors
 
-## Licensing
+<!-- AI:start:contributors -->
+_Contributors pending._
+<!-- AI:end:contributors -->
 
-This repository is made available under the Apache 2.0 License, with portions of this work derived from the [LXD Data Source](https://github.com/canonical/cloud-init/blob/main/cloudinit/sources/DataSourceLXD.py) within [Cloud-Init](https://github.com/canonical/cloud-init) which I elect to license under Apache 2.0.
+## Origins
+
+<!-- AI:start:origins -->
+_Original project — no upstream influences recorded._
+<!-- AI:end:origins -->
+
+## Resources
+
+<!-- AI:start:resources -->
+_No additional resource files found._
+<!-- AI:end:resources -->
+
+## Accessibility
+
+<!-- AI:start:accessibility -->
+This repo uses automated accessibility auditing via `check-accessibility.yml`.
+
+Checks include: CODEOWNERS ownership coverage, README screen-reader compatibility,
+WCAG 2.1 AA HTML compliance, audio overview (espeak-ng), and Braille output (liblouis).
+
+
+
+
+Run the [Check Accessibility](https://github.com/Interested-Deving-1896/incus-cloud-init/actions/workflows/check-accessibility.yml)
+workflow to generate the first report and accessibility artifacts.
+See [DOCS/accessibility.md](https://github.com/Interested-Deving-1896/incus-cloud-init/blob/main/DOCS/accessibility.md) for the full reference.
+<!-- AI:end:accessibility -->
+
+## License
+
+<!-- AI:start:license -->
+[Apache-2.0](https://github.com/Interested-Deving-1896/incus-cloud-init/blob/main/LICENSE) © 2026 [Interested-Deving-1896](https://github.com/Interested-Deving-1896)
+<!-- AI:end:license -->
